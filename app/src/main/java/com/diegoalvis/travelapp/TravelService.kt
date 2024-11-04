@@ -1,15 +1,13 @@
 package com.diegoalvis.travelapp
 
 import android.net.Uri
-import com.diegoalvis.example.grpc.Travel.Destination
+import com.diegoalvis.example.grpc.Destination
 import com.diegoalvis.example.grpc.TravelServiceGrpcKt
 import com.diegoalvis.example.grpc.getDestinationsRequest
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
 import java.io.Closeable
 
 const val SERVER_URL = "http://10.0.2.2:50051/"
@@ -47,5 +45,8 @@ fun createChannel(serverUrl: String): ManagedChannel {
     } else {
         builder.usePlaintext()
     }
-    return builder.executor(Dispatchers.IO.asExecutor()).build()
+    return builder
+        .intercept(LoggingInterceptor())
+        .executor(Dispatchers.IO.asExecutor())
+        .build()
 }
