@@ -15,6 +15,7 @@ protobufPluginVersion = "0.9.4"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.9.3"
 composeBom = "2024.10.01"
+navigationCompose = "2.8.3"
 
 [libraries]
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
@@ -48,6 +49,7 @@ grpcKotlin = { group = "io.grpc", name = "protoc-gen-grpc-kotlin", version.ref =
 coroutinesBom = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-bom", version.ref = "coroutinesBomVersion" }
 coroutinesAndroid = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android" }
 coroutinesRx = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-rx3" }
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

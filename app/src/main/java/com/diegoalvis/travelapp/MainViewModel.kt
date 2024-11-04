@@ -1,12 +1,10 @@
 package com.diegoalvis.travelapp
 
-import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.diegoalvis.example.grpc.Travel.Destination
+import com.diegoalvis.example.grpc.Destination
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
@@ -18,8 +16,8 @@ class MainViewModel : ViewModel() {
 
     fun loadDestination() {
         viewModelScope.launch {
+        _uiState.emit(UiState.Loading)
             try {
-                _uiState.emit(UiState.Loading)
                 val destinations = service.getDestinations()
                 _uiState.emit(UiState.Success(data = destinations))
             } catch (e: Exception) {
@@ -33,8 +31,6 @@ class MainViewModel : ViewModel() {
         service.close()
     }
 
-
-    @Immutable
     sealed interface UiState {
         data object Initial : UiState
         data object Loading : UiState

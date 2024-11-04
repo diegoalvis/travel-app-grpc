@@ -4,69 +4,102 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
-import com.diegoalvis.example.grpc.Travel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.diegoalvis.example.grpc.Destination
+import com.diegoalvis.travelapp.components.DestinationDetailsScreen
+import com.diegoalvis.travelapp.components.DestinationListScreen
 
 
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val mainViewModel by viewModels<MainViewModel>()
+        val viewModel by viewModels<MainViewModel>()
         setContent {
+            LaunchedEffect(Unit) {
+                viewModel.loadDestination()
+            }
             Surface(color = MaterialTheme.colorScheme.background) {
-                DestinationScreen(mainViewModel)
+                HomeScreen(viewModel)
             }
         }
     }
 }
 
 @Composable
-fun DestinationScreen(viewModel: MainViewModel) {
+fun HomeScreen(viewModel: MainViewModel) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-
-    LaunchedEffect(Unit) {
-        viewModel.loadDestination()
-    }
-
-    when (val state = uiState) {
-        is MainViewModel.UiState.Initial -> {
-            InitialScreen()
+    Column(modifier = Modifier.padding(16.dp)) {
+        Text(
+            text = "Are you ready to explore the world?",
+            style = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier.padding(8.dp)
+        )
+        TextField(
+            value = "",
+            onValueChange = {},
+            placeholder = { Text(text = "Find location") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            TextButton(onClick = { /* All */ }) { Text("All") }
+            TextButton(onClick = { /* New */ }) { Text("New") }
+            TextButton(onClick = { /* Trend */ }) { Text("Trend") }
+            TextButton(onClick = { /* Mountain */ }) { Text("Mountain") }
         }
+        Spacer(modifier = Modifier.height(16.dp))
 
-        is MainViewModel.UiState.Loading -> {
-            LoadingScreen()
-        }
+        when (val state = uiState) {
+            is MainViewModel.UiState.Initial -> {
+                InitialScreen()
+            }
 
-        is MainViewModel.UiState.Success -> {
-            DestinationListScreen(destinations = state.data)
-        }
+            is MainViewModel.UiState.Loading -> {
+                LoadingScreen()
+            }
 
-        is MainViewModel.UiState.Error -> {
-            ErrorScreen(errorMessage = state.errorMessage) {
-                viewModel.loadDestination() // Retry on error
+            is MainViewModel.UiState.Success -> {
+                MainContent(destinations = state.data)
+            }
+
+            is MainViewModel.UiState.Error -> {
+                ErrorScreen(errorMessage = state.errorMessage) {
+                    viewModel.loadDestination() // Retry on error
+                }
             }
         }
     }
 }
+
 
 @Composable
 fun InitialScreen() {
@@ -98,79 +131,23 @@ fun ErrorScreen(errorMessage: String, onRetry: () -> Unit) {
 }
 
 @Composable
-fun DestinationListScreen(destinations: List<Travel.Destination>) {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        items(items = destinations) { element ->
-            DestinationItem(element)
-            Spacer(modifier = Modifier.padding(vertical = 8.dp))
+fun MainContent(destinations: List<Destination>) {
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = "destinationList") {
+        composable("destinationList") {
+            DestinationListScreen(
+                destinations = destinations,
+                onDestinationClick = { destination ->
+                    navController.navigate("destinationDetails/${destination.id}")
+                }
+            )
         }
-    }
-}
-
-@Composable
-fun DestinationItem(destination: Travel.Destination) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(text = destination.title, style = MaterialTheme.typography.headlineLarge)
-        Text(text = destination.description, style = MaterialTheme.typography.bodyMedium)
-        AsyncImage(
-            model = destination.imageUrl,
-            contentDescription = destination.title,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(180.dp)
-                .clip(RoundedCornerShape(8.dp)),
-            contentScale = ContentScale.Crop
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Display "Things to Do" in destination
-        Text(text = "Things to Do", style = MaterialTheme.typography.headlineLarge)
-        destination.thingsToDoList.forEach { thingToDo ->
-            ThingToDoItem(thingToDo)
+        composable("destinationDetails/{destinationId}") { backStackEntry ->
+            val destinationId = backStackEntry.arguments?.getString("destinationId")
+            val destination = destinations.find { it.id == destinationId }
+            destination?.let {
+                DestinationDetailsScreen(it)
+            }
         }
-
-        // Display "Food and Drinks" in destination
-        Text(text = "Food and Drinks", style = MaterialTheme.typography.headlineLarge)
-        destination.foodAndDrinksList.forEach { foodAndDrink ->
-            FoodAndDrinkItem(foodAndDrink)
-        }
-    }
-}
-
-@Composable
-fun ThingToDoItem(thingToDo: Travel.ThingToDo) {
-    Column {
-        Text(text = thingToDo.title, style = MaterialTheme.typography.bodySmall)
-        Text(text = "Reviews: ${thingToDo.reviewsCount} - Score: ${thingToDo.score}", style = MaterialTheme.typography.labelMedium)
-        AsyncImage(
-            model = thingToDo.imageUrl,
-            contentDescription = thingToDo.title,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(120.dp)
-                .clip(RoundedCornerShape(8.dp)),
-            contentScale = ContentScale.Crop
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-    }
-}
-
-@Composable
-fun FoodAndDrinkItem(foodAndDrink: Travel.FoodAndDrink) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        AsyncImage(
-            model = foodAndDrink.imageUrl,
-            contentDescription = foodAndDrink.name,
-            modifier = Modifier
-                .size(50.dp)
-                .clip(CircleShape),
-            contentScale = ContentScale.Crop
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(text = foodAndDrink.name, style = MaterialTheme.typography.bodyMedium)
     }
 }

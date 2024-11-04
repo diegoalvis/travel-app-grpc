@@ -1,5 +1,8 @@
 syntax = "proto3";
 
+option java_multiple_files = true;
+option java_outer_classname = "TravelProto";
+
 package com.diegoalvis.example.grpc;
 
 service TravelService {
@@ -45,6 +48,6 @@ message FoodAndDrink {
 
 
 // Used to mock data base info from a local file in disk.
-message TravelDatabase {
+message DestinationDataSet {
   repeated Destination destination = 1;
 }
