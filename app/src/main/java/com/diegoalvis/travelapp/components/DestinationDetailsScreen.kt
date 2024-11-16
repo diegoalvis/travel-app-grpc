@@ -1,12 +1,15 @@
 package com.diegoalvis.travelapp.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -75,16 +78,21 @@ fun DestinationDetailsScreen(destination: Destination) {
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text("Things to Do", style = MaterialTheme.typography.titleMedium)
-            Spacer(modifier = Modifier.height(4.dp))
-            LazyRow {
+            Spacer(modifier = Modifier.height(8.dp))
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
                 items(destination.thingsToDoList) { thing ->
                     ThingToDoItem(thingToDo = thing)
+                    Spacer(modifier = Modifier.width(8.dp))
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
             Text("Food and Drinks", style = MaterialTheme.typography.titleMedium)
-            Spacer(modifier = Modifier.height(4.dp))
-            LazyRow {
+            Spacer(modifier = Modifier.height(8.dp))
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
                 items(destination.foodAndDrinksList) { food ->
                     FoodAndDrinkItem(foodAndDrink = food)
                 }
