@@ -33,6 +33,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.diegoalvis.example.grpc.Destination
+import com.diegoalvis.travelapp.BaseMainViewModel.UiState
 import com.diegoalvis.travelapp.components.DestinationDetailsScreen
 import com.diegoalvis.travelapp.components.DestinationListScreen
 
@@ -41,10 +42,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val viewModel by viewModels<MainViewModel>()
+        val viewModel: BaseMainViewModel by viewModels { BaseMainViewModel.Factory }
         setContent {
             LaunchedEffect(Unit) {
-                viewModel.loadDestination()
+                viewModel.loadData()
             }
             Surface(color = MaterialTheme.colorScheme.background) {
                 HomeScreen(viewModel)
@@ -54,7 +55,7 @@ class MainActivity : AppCompatActivity() {
 }
 
 @Composable
-fun HomeScreen(viewModel: MainViewModel) {
+fun HomeScreen(viewModel: BaseMainViewModel) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Column(modifier = Modifier.padding(16.dp)) {
@@ -79,21 +80,21 @@ fun HomeScreen(viewModel: MainViewModel) {
         Spacer(modifier = Modifier.height(16.dp))
 
         when (val state = uiState) {
-            is MainViewModel.UiState.Initial -> {
+            is UiState.Initial -> {
                 InitialScreen()
             }
 
-            is MainViewModel.UiState.Loading -> {
+            is UiState.Loading -> {
                 LoadingScreen()
             }
 
-            is MainViewModel.UiState.Success -> {
+            is UiState.Success -> {
                 MainContent(destinations = state.data)
             }
 
-            is MainViewModel.UiState.Error -> {
+            is UiState.Error -> {
                 ErrorScreen(errorMessage = state.errorMessage) {
-                    viewModel.loadDestination() // Retry on error
+                    viewModel.loadData() // Retry on error
                 }
             }
         }

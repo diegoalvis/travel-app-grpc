@@ -2,8 +2,7 @@ package com.diegoalvis.travelapp.utils
 
 import android.content.Context
 import com.diegoalvis.example.grpc.Destination
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import jsonToProtobuf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -26,13 +25,7 @@ fun ReadJSONFromAssets(context: Context, path: String): String {
 
 suspend fun getDestinationsMockData(context: Context): List<Destination> {
     return withContext(Dispatchers.IO) {
-        try {
-            val json = ReadJSONFromAssets(context, "mock_destinations.json")
-            val collectionType = object : TypeToken<List<Destination>>() {}.type
-            Gson().fromJson(json, collectionType)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            emptyList()
-        }
+        val json = ReadJSONFromAssets(context, "mock_destinations.json")
+        jsonToProtobuf(json)
     }
 }
