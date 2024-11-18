@@ -31,3 +31,6 @@ google-services.json
 
 # Android Profiling
 *.hprof
+
+# Maestro UI tests
+./maestro_test/samples/
