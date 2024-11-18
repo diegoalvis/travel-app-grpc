@@ -40,18 +40,18 @@ fun DestinationDetailsScreen(destination: Destination) {
                     contentDescription = destination.title,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(200.dp)
+                        .height(220.dp)
                         .clip(RoundedCornerShape(20.dp)),
                     contentScale = ContentScale.Crop
                 )
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(200.dp)
+                        .height(220.dp)
                         .background(
                             Brush.verticalGradient(
                                 colors = listOf(Color.Transparent, Color.Black),
-                                startY = 100f
+                                startY = 400f
                             )
                         )
                 )

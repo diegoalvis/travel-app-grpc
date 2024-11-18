@@ -1,0 +1,7 @@
+appId: com.diegoalvis.travelapp
+tags:
+  - android
+  - passing
+---
+- launchApp:
+    clearState: true

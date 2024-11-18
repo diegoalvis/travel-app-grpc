@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
 fun HomeScreen(viewModel: BaseMainViewModel) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    Column(modifier = Modifier.padding(16.dp)) {
+    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
         Text(
             text = "Are you ready to explore the world?",
             style = MaterialTheme.typography.headlineSmall,

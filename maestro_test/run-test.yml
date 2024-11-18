@@ -3,9 +3,16 @@ tags:
   - android
   - passing
 ---
+
 - launchApp:
     clearState: true
-#- runFlow: "onboarding/main.yml"
-#- runFlow: "dashboard/main.yml"
-#- runFlow: "auth/signup.yml"
-#- runFlow: "auth/login.yml"
+- assertVisible: "Are you ready to explore the world?"
+- tapOn: "Tokyo"
+- assertVisible: "Tokyo is a bustling metropolis.*"
+- assertVisible: "Tokyo Tower"
+- scrollUntilVisible:
+    element:
+      text: "sushi"
+    visibilityPercentage: 100
+
+
