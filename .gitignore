@@ -33,4 +33,4 @@ google-services.json
 *.hprof
 
 # Maestro UI tests
-./maestro_test/samples/
+/maestro_test/samples/
